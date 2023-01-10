@@ -57,8 +57,7 @@ class _HomePageState extends State<HomePage> {
                           return 'نام تکمیل کننده فرم الزامیست';
                         }
                       },
-                      decoration: const InputDecoration(
-                          labelText: 'نام تکمیل کننده فرم'),
+                      decoration: const InputDecoration(labelText: 'نام تکمیل کننده فرم'),
                       onSaved: (v) {
                         _info.formFiller = v ?? '';
                       }),
@@ -71,8 +70,7 @@ class _HomePageState extends State<HomePage> {
                       textAlign: TextAlign.left,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       keyboardType: TextInputType.number,
-                      decoration:
-                          const InputDecoration(labelText: 'شماره تماس'),
+                      decoration: const InputDecoration(labelText: 'شماره تماس'),
                       onSaved: (v) {
                         _info.callNumber = int.tryParse(v ?? '') ?? 0;
                       }),
@@ -92,8 +90,7 @@ class _HomePageState extends State<HomePage> {
                           return 'شرایط احراز تحصیلی یا تجربی الزامیست';
                         }
                       },
-                      decoration: const InputDecoration(
-                          labelText: 'شرایط احراز تحصیلی یا تجربی'),
+                      decoration: const InputDecoration(labelText: 'شرایط احراز تحصیلی یا تجربی'),
                       onSaved: (v) {
                         _info.qualifications = v ?? '';
                       }),
@@ -119,8 +116,7 @@ class _HomePageState extends State<HomePage> {
                       textAlign: TextAlign.left,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                          labelText: 'تعداد نیروها به نفر'),
+                      decoration: const InputDecoration(labelText: 'تعداد نیروها به نفر'),
                       onSaved: (v) {
                         _info.staffNumber = int.tryParse(v ?? '') ?? 0;
                       }),
@@ -132,8 +128,7 @@ class _HomePageState extends State<HomePage> {
                           return null;
                         }
                       },
-                      decoration: const InputDecoration(
-                          labelText: 'اقلام حقوق و مزایا با ذکر نام'),
+                      decoration: const InputDecoration(labelText: 'اقلام حقوق و مزایا با ذکر نام'),
                       onSaved: (List<String>? v) {
                         _info.perks = v ?? [];
                       }),
@@ -143,8 +138,7 @@ class _HomePageState extends State<HomePage> {
                           return 'مستندات قانونی پرداخت حقوق و مزایا الزامیست';
                         }
                       },
-                      decoration: const InputDecoration(
-                          labelText: 'مستندات قانونی پرداخت حقوق و مزایا'),
+                      decoration: const InputDecoration(labelText: 'مستندات قانونی پرداخت حقوق و مزایا'),
                       onSaved: (v) {
                         _info.docs = v ?? '';
                       }),
@@ -165,15 +159,15 @@ class _HomePageState extends State<HomePage> {
                                 'docs': _info.docs,
                               },
                             );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('با موفقیت ثبت شد')));
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('با موفقیت ثبت شد')));
+                            }
                           } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(e.toString())));
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
                           }
                         }
                       },
-                      child: Text('ثبت اطلاعات'))
+                      child: const Text('ثبت اطلاعات'))
                 ],
               )),
         ),
