@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
- 
+
 import 'pages/home_page.dart';
 import 'values.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseKey);
+  String supabaseUrl = const String.fromEnvironment("SUPABASE_URL");
+  String supabaseKey = const String.fromEnvironment("SUPABASE_KEY");
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
 
   runApp(const App());
 }
