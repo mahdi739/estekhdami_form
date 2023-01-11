@@ -1,3 +1,4 @@
+import 'package:estekhdami_form/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -7,9 +8,11 @@ import 'values.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await StorageService.init();
   String supabaseUrl = const String.fromEnvironment("SUPABASE_URL");
   String supabaseKey = const String.fromEnvironment("SUPABASE_KEY");
-  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
+  
+  await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseKey);
 
   runApp(const App());
 }

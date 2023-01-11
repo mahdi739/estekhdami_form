@@ -36,13 +36,19 @@ dependencies:
   envied: ^0.3.0
   cupertino_icons: ^1.0.2
   supabase_flutter: ^1.2.2
-
+  rxdart_ext: ^0.2.7
+  path_provider: ^2.0.11
+  shared_preferences: ^2.0.15
+  freezed_annotation: ^2.2.0
+  json_annotation: ^4.7.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
   build_runner: ^2.3.3
   envied_generator: ^0.3.0
+  freezed: ^2.3.2
+  json_serializable: ^6.5.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

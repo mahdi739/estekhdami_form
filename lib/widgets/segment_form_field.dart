@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../pages/home_page.dart';
 import 'adding_text_field.dart';
 
 class SegmentFormField extends FormField<TaskType?> {
@@ -35,9 +37,7 @@ class SegmentFormField extends FormField<TaskType?> {
                     padding: EdgeInsets.zero,
                     constraints: BoxConstraints(minHeight: 40),
                     decoration: BoxDecoration(
-                        borderRadius:
-                            BorderRadius.all(Radius.circular(borderRadius)),
-                        border: Border.all(color: backgroundColor, width: 1)),
+                        borderRadius: BorderRadius.all(Radius.circular(borderRadius)), border: Border.all(color: backgroundColor, width: 1)),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: TaskType.values
@@ -52,15 +52,10 @@ class SegmentFormField extends FormField<TaskType?> {
                                     constraints: BoxConstraints(minWidth: 80),
                                     padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
                                     alignment: Alignment.center,
-                                    color: e == state.value
-                                        ? backgroundColor
-                                        : Colors.transparent,
+                                    color: e == state.value ? backgroundColor : Colors.transparent,
                                     child: Text(
                                       e.label,
-                                      style: TextStyle(
-                                          color: e == state.value
-                                              ? selectedForegroundColor
-                                              : backgroundColor),
+                                      style: TextStyle(color: e == state.value ? selectedForegroundColor : backgroundColor),
                                     ),
                                   ),
                                 ),
@@ -90,11 +85,3 @@ class SegmentFormField extends FormField<TaskType?> {
         );
 }
 
-enum TaskType {
-  main('اصلی',0),
-  support('پشتیبانی',1);
-
-  final int code;
-  final String label;
-  const TaskType(this.label,this.code);
-}
