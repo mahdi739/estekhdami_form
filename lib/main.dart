@@ -22,7 +22,7 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = ThemeData.light().textTheme.apply(fontFamily: 'IRAN Sans').copyWith(button: TextStyle(fontSize: 22, fontFamily: 'IRAN Sans'));
+    final textTheme = ThemeData.light().textTheme.apply(fontFamily: 'IRAN Sans').copyWith(button: TextStyle(fontSize: 18, fontFamily: 'IRAN Sans'));
     return MaterialApp(
       theme: ThemeData.light().copyWith(colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 223, 245, 252)), textTheme: textTheme),
       localizationsDelegates: [

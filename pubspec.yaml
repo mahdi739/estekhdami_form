@@ -5,6 +5,13 @@ description: A new Flutter project.
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
+
+msix_config:
+  display_name: estekhdami_form
+  msix_version: 1.0.0.0
+  logo_path: D:\Projects\Dart\estekhdami_form\windows\runner\resources\app_icon.ico
+  publisher: CN=Contoso Software, O=Contoso Corporation, C=US
+  sign_msix: false
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +.
@@ -51,6 +58,7 @@ dev_dependencies:
   envied_generator: ^0.3.0
   freezed: ^2.3.2
   json_serializable: ^6.5.4
+  msix: ^3.7.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

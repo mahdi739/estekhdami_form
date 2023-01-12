@@ -12,7 +12,7 @@ class SegmentFormField extends FormField<TaskType?> {
   final double borderRadius;
   SegmentFormField({
     this.borderRadius = 15,
-    this.height = 45,
+    this.height = 40,
     Key? key,
     TaskType? initialValue,
     onSaved,
@@ -36,7 +36,6 @@ class SegmentFormField extends FormField<TaskType?> {
                   child: Container(
                     height: height,
                     padding: EdgeInsets.zero,
-                    constraints: BoxConstraints(minHeight: 40),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(borderRadius)), border: Border.all(color: backgroundColor, width: 1)),
                     child: Row(
@@ -56,7 +55,7 @@ class SegmentFormField extends FormField<TaskType?> {
                                     color: e == state.value ? backgroundColor : Colors.transparent,
                                     child: Text(
                                       e.label,
-                                      style: TextStyle(color: e == state.value ? selectedForegroundColor : backgroundColor, fontSize: 18),
+                                      style: TextStyle(color: e == state.value ? selectedForegroundColor : backgroundColor, fontSize: 16),
                                     ),
                                   ),
                                 ),
