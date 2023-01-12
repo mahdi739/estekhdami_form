@@ -44,7 +44,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   supabase_flutter: ^1.2.2
   rxdart_ext: ^0.2.7
-  path_provider: ^2.0.11
+  # path_provider: ^2.0.11
   shared_preferences: ^2.0.15
   freezed_annotation: ^2.2.0
   json_annotation: ^4.7.0
