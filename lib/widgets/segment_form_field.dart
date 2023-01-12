@@ -30,6 +30,7 @@ class SegmentFormField extends FormField<TaskType?> {
             return Column(
               children: [
                 Material(
+                  color: Colors.transparent,
                   borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
                   clipBehavior: Clip.antiAlias,
                   child: Container(
@@ -49,13 +50,13 @@ class SegmentFormField extends FormField<TaskType?> {
                                     state.didChange(e);
                                   },
                                   child: Container(
-                                    constraints: BoxConstraints(minWidth: 80),
+                                    constraints: BoxConstraints(minWidth: 100),
                                     padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
                                     alignment: Alignment.center,
                                     color: e == state.value ? backgroundColor : Colors.transparent,
                                     child: Text(
                                       e.label,
-                                      style: TextStyle(color: e == state.value ? selectedForegroundColor : backgroundColor),
+                                      style: TextStyle(color: e == state.value ? selectedForegroundColor : backgroundColor, fontSize: 18),
                                     ),
                                   ),
                                 ),
@@ -84,4 +85,3 @@ class SegmentFormField extends FormField<TaskType?> {
           },
         );
 }
-

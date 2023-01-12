@@ -11,7 +11,7 @@ Future<void> main() async {
   await StorageService.init();
   String supabaseUrl = const String.fromEnvironment("SUPABASE_URL");
   String supabaseKey = const String.fromEnvironment("SUPABASE_KEY");
-  
+
   await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseKey);
 
   runApp(const App());
@@ -22,7 +22,9 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    final textTheme = ThemeData.light().textTheme.apply(fontFamily: 'IRAN Sans').copyWith(button: TextStyle(fontSize: 22, fontFamily: 'IRAN Sans'));
+    return MaterialApp(
+      theme: ThemeData.light().copyWith(colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 223, 245, 252)), textTheme: textTheme),
       localizationsDelegates: [
         GlobalCupertinoLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
