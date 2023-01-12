@@ -12,7 +12,7 @@ Future<void> main() async {
   String supabaseUrl = const String.fromEnvironment("SUPABASE_URL");
   String supabaseKey = const String.fromEnvironment("SUPABASE_KEY");
 
-  await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseKey);
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
 
   runApp(const App());
 }
