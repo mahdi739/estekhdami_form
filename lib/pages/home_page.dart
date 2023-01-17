@@ -31,6 +31,12 @@ enum TaskType {
   // static TaskType fromJson(int code) => values.firstWhere((element) => element.code == code);
 }
 
+@freezed
+class Job with _$Job {
+  const factory Job({required String title, required String qualifications}) = _Job;
+  factory Job.fromJson(Map<String, Object?> json) => _$JobFromJson(json);
+}
+
 @JsonEnum(valueField: 'code')
 enum SyncState {
   writing(0),
@@ -63,8 +69,9 @@ class Info with _$Info {
     String? orgName,
     String? formFiller,
     int? callNumber,
-    String? jobTitle,
-    String? qualifications,
+    // String? jobTitle,
+    // String? qualifications,
+    @Default([Job(title: '', qualifications: '')]) List<Job> jobs,
     TaskType? taskType,
     int? staffNumber,
     int? averageSalary,
@@ -94,23 +101,31 @@ class _HomePageState extends State<HomePage> {
   List<String> _perks = [''];
   List<FocusNode> _perksNodes = [FocusNode()];
   bool _wasEditingPerk = false;
+  bool _wasEditingJobs = false;
   String _docs = '';
+  List<Job> _jobs = [Job(title: '', qualifications: '')];
 
   // final _info = Info();
   final _isSending = BehaviorSubject.seeded(false);
   final _infos = BehaviorSubject.seeded(<Info>[]);
   final _syncStates = BehaviorSubject.seeded(<SyncState>[]);
   final _status = BehaviorSubject.seeded(const Status.creating(info: Info()));
-  final _perksLength = BehaviorSubject.seeded(['']);
+  final _perksStream = BehaviorSubject.seeded(['']);
+  final _jobsStream = BehaviorSubject.seeded([Job(title: '', qualifications: '')]);
+
   @override
   void initState() {
     _infos.listen((value) {
       _syncStates.sink.add(value.map((e) => e.syncState).toList());
     });
     _status.listen((value) {
-      _perksLength.add(value.info.perks.toList());
+      _perksStream.add(value.info.perks.toList());
+      _jobsStream.add(value.info.jobs.toList());
     });
-    _perksLength.listen((value) {
+    _jobsStream.listen((value) {
+      _jobs = value;
+    });
+    _perksStream.listen((value) {
       _perks = value;
     });
     // _infos.add([]);
@@ -132,15 +147,12 @@ class _HomePageState extends State<HomePage> {
       _infos.sink.add(_infos.value.whereNot((element) => element.localDate == _info.localDate).toList());
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('با موفقیت حذف شد✅'),
-          duration: Duration(seconds: 10),
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('با موفقیت حذف شد✅'), duration: Duration(seconds: 10)));
       }
       return true;
     } catch (e) {
       _infos.sink.add([for (var e in _infos.value) e.localDate != _info.localDate ? e : _info.copyWith(syncState: SyncState.deleteFailed)]);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: SelectableText(e.toString())));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: SelectableText(e.toString()), duration: Duration(seconds: 10)));
       return false;
     } finally {
       _saveToStorage();
@@ -159,8 +171,9 @@ class _HomePageState extends State<HomePage> {
           'dep_name': _info.depName,
           'org_name': _info.orgName,
           'call_number': _info.callNumber,
-          'job_title': _info.jobTitle,
-          'qualifications': _info.qualifications,
+          // 'job_title': _info.jobTitle,
+          // 'qualifications': _info.qualifications,
+          'jobs': _info.jobs.map((e) => jsonEncode(e.toJson())).toList(),
           'task_type': _info.taskType?.code,
           'staff_number': _info.staffNumber,
           'perks': _info.perks,
@@ -199,8 +212,9 @@ class _HomePageState extends State<HomePage> {
           'dep_name': _info.depName,
           'org_name': _info.orgName,
           'call_number': _info.callNumber,
-          'job_title': _info.jobTitle,
-          'qualifications': _info.qualifications,
+          // 'job_title': _info.jobTitle,
+          // 'qualifications': _info.qualifications,
+          'jobs': _info.jobs.map((e) => jsonEncode(e.toJson())).toList(),
           'task_type': _info.taskType?.code,
           'staff_number': _info.staffNumber,
           'perks': _info.perks,
@@ -232,13 +246,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _saveToStorage() {
-    StorageService.instance.setStringList(
-        'savedInfo',
-        _infos.value.map((e) {
-          String saving = jsonEncode(e.toJson());
-          print(saving);
-          return saving;
-        }).toList());
+    StorageService.instance.setStringList('savedInfo', _infos.value.map((e) => jsonEncode(e.toJson())).toList());
   }
 
   @override
@@ -347,37 +355,89 @@ class _HomePageState extends State<HomePage> {
                                     _callNumber = int.tryParse(v ?? '') ?? 0;
                                   }),
                               SizedBox(height: 20),
-                              TextFormField(
-                                  style: TextStyle(fontSize: 16),
-                                  initialValue: status.info.jobTitle,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'عنوان شغل الزامیست';
-                                    }
-                                  },
-                                  decoration: InputDecoration(
-                                      contentPadding: EdgeInsets.fromLTRB(12, 0, 12, 0),
-                                      labelText: 'عنوان شغل',
-                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15))),
-                                  onSaved: (v) {
-                                    _jobTitle = v ?? '';
-                                  }),
-                              SizedBox(height: 20),
-                              TextFormField(
-                                  style: TextStyle(fontSize: 16),
-                                  initialValue: status.info.qualifications,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'شرایط احراز تحصیلی یا تجربی الزامیست';
-                                    }
-                                  },
-                                  decoration: InputDecoration(
-                                      contentPadding: EdgeInsets.fromLTRB(12, 0, 12, 0),
-                                      labelText: 'شرایط احراز تحصیلی یا تجربی',
-                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15))),
-                                  onSaved: (v) {
-                                    _qualifications = v ?? '';
-                                  }),
+                              StreamBuilder<List<Job>>(
+                                stream: _jobsStream.stream,
+                                initialData: status.info.jobs,
+                                builder: (context, snapshot) {
+                                  var _jobsNodes = snapshot.data!.map((e) => FocusNode()).toList();
+                                  SchedulerBinding.instance.addPostFrameCallback(
+                                    (_) {
+                                      if (_wasEditingJobs) {
+                                        _jobsNodes.last.requestFocus();
+                                      }
+                                    },
+                                  );
+
+                                  return Column(
+                                    children: [
+                                      for (int i = 0; i < snapshot.data!.length; i++)
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(0, 3, 0, 3),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              i == snapshot.data!.length - 1
+                                                  ? ExcludeFocusTraversal(
+                                                      child: IconButton(
+                                                          onPressed: () {
+                                                            _wasEditingJobs = true;
+                                                            _jobsNodes[i].unfocus();
+                                                            _jobsStream.add([..._jobsStream.value, Job(title: '', qualifications: '')]);
+                                                          },
+                                                          icon: const Icon(Icons.add)),
+                                                    )
+                                                  : ExcludeFocusTraversal(
+                                                      child: IconButton(
+                                                          onPressed: () {
+                                                            _wasEditingJobs = false;
+                                                            _jobsNodes[i].unfocus();
+
+                                                            _jobsStream
+                                                                .add(_jobsStream.value.whereNotIndexed((index, element) => index == i).toList());
+                                                          },
+                                                          icon: const Icon(Icons.delete_outlined)),
+                                                    ),
+                                              Expanded(
+                                                child: TextFormField(
+                                                    style: TextStyle(fontSize: 16),
+                                                    initialValue: status.info.jobs[i].title,
+                                                    validator: (value) {
+                                                      if (value == null || value.isEmpty) {
+                                                        return 'عنوان شغل الزامیست';
+                                                      }
+                                                    },
+                                                    decoration: InputDecoration(
+                                                        contentPadding: EdgeInsets.fromLTRB(12, 0, 12, 0),
+                                                        labelText: 'عنوان شغل',
+                                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15))),
+                                                    onSaved: (v) {
+                                                      _jobs[i] = _jobs[i].copyWith(title: v ?? '');
+                                                    }),
+                                              ),
+                                              Expanded(
+                                                child: TextFormField(
+                                                    style: TextStyle(fontSize: 16),
+                                                    initialValue: status.info.jobs[i].qualifications,
+                                                    validator: (value) {
+                                                      if (value == null || value.isEmpty) {
+                                                        return 'شرایط احراز تحصیلی یا تجربی الزامیست';
+                                                      }
+                                                    },
+                                                    decoration: InputDecoration(
+                                                        contentPadding: EdgeInsets.fromLTRB(12, 0, 12, 0),
+                                                        labelText: 'شرایط احراز تحصیلی یا تجربی',
+                                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15))),
+                                                    onSaved: (v) {
+                                                      _jobs[i] = _jobs[i].copyWith(qualifications: v ?? '');
+                                                    }),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                    ],
+                                  );
+                                },
+                              ),
                               SizedBox(height: 15),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -478,7 +538,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                   StreamBuilder<List<String>>(
-                                    stream: _perksLength.stream,
+                                    stream: _perksStream.stream,
                                     initialData: status.info.perks,
                                     builder: (context, snapshot) {
                                       var _perksNodes = snapshot.data!.map((e) => FocusNode()).toList();
@@ -504,7 +564,7 @@ class _HomePageState extends State<HomePage> {
                                                               onPressed: () {
                                                                 _wasEditingPerk = true;
                                                                 _perksNodes[i].unfocus();
-                                                                _perksLength.add([..._perksLength.value, '']);
+                                                                _perksStream.add([..._perksStream.value, '']);
                                                               },
                                                               icon: const Icon(Icons.add)),
                                                         )
@@ -514,8 +574,8 @@ class _HomePageState extends State<HomePage> {
                                                                 _wasEditingPerk = false;
                                                                 _perksNodes[i].unfocus();
 
-                                                                _perksLength
-                                                                    .add(_perksLength.value.whereNotIndexed((index, element) => index == i).toList());
+                                                                _perksStream
+                                                                    .add(_perksStream.value.whereNotIndexed((index, element) => index == i).toList());
                                                               },
                                                               icon: const Icon(Icons.delete_outlined)),
                                                         ),
@@ -534,7 +594,7 @@ class _HomePageState extends State<HomePage> {
                                                         _wasEditingPerk = true;
                                                         _perksNodes[i].unfocus();
 
-                                                        _perksLength.add([..._perksLength.value, '']);
+                                                        _perksStream.add([..._perksStream.value, '']);
                                                       },
                                                       // controller: _controller.value,
                                                       decoration: InputDecoration(
@@ -612,6 +672,8 @@ class _HomePageState extends State<HomePage> {
                                                         if (_formKey.currentState!.validate()) {
                                                           _formKey.currentState!.save();
                                                           _perks.removeWhere((element) => element.trim().isEmpty);
+                                                          _jobs.removeWhere(
+                                                              (element) => element.title.trim().isEmpty || element.qualifications.trim().isEmpty);
                                                           _status.add(const Status.creating(info: Info()));
 
                                                           await status.when(creating: (_) async {
@@ -621,9 +683,10 @@ class _HomePageState extends State<HomePage> {
                                                                 orgName: _orgName,
                                                                 depName: _depName,
                                                                 formFiller: _formFiller,
-                                                                jobTitle: _jobTitle,
+                                                                jobs: _jobs,
+                                                                // jobTitle: _jobTitle,
                                                                 callNumber: _callNumber,
-                                                                qualifications: _qualifications,
+                                                                // qualifications: _qualifications,
                                                                 staffNumber: _staffNumber,
                                                                 perks: _perks,
                                                                 averageSalary: _averageSalary,
@@ -639,9 +702,10 @@ class _HomePageState extends State<HomePage> {
                                                                 orgName: _orgName,
                                                                 depName: _depName,
                                                                 formFiller: _formFiller,
-                                                                jobTitle: _jobTitle,
+                                                                jobs: _jobs,
+                                                                // jobTitle: _jobTitle,
                                                                 callNumber: _callNumber,
-                                                                qualifications: _qualifications,
+                                                                // qualifications: _qualifications,
                                                                 staffNumber: _staffNumber,
                                                                 perks: _perks,
                                                                 averageSalary: _averageSalary,
@@ -783,19 +847,19 @@ class _HomePageState extends State<HomePage> {
                                         alignment: Alignment.topCenter,
                                         constraints: BoxConstraints(minHeight: 45),
                                         child: Text(
-                                          'عنوان شغل (کار / حرفه)',
+                                          'مشاغل',
                                           textAlign: TextAlign.center,
                                           style: TextStyle(color: Colors.white),
                                         )),
-                                    Container(
-                                        padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                                        alignment: Alignment.topCenter,
-                                        constraints: BoxConstraints(minHeight: 45),
-                                        child: Text(
-                                          'شرایط احراز تحصیلی یا تجربی',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(color: Colors.white),
-                                        )),
+                                    // Container(
+                                    //     padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                    //     alignment: Alignment.topCenter,
+                                    //     constraints: BoxConstraints(minHeight: 45),
+                                    //     child: Text(
+                                    //       'شرایط احراز تحصیلی یا تجربی',
+                                    //       textAlign: TextAlign.center,
+                                    //       style: TextStyle(color: Colors.white),
+                                    //     )),
                                     Container(
                                         padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                                         alignment: Alignment.topCenter,
@@ -1065,22 +1129,24 @@ class _HomePageState extends State<HomePage> {
                                                   e.callNumber!.toString(),
                                                   textAlign: TextAlign.center,
                                                 ))),
+                                        // TableCell(
+                                        //     verticalAlignment: TableCellVerticalAlignment.middle,
+                                        //     child: Container(
+                                        //         alignment: Alignment.center,
+                                        //         constraints: BoxConstraints(minHeight: 45),
+                                        //         child: Text(
+                                        //           e.jobTitle!,
+                                        //           textAlign: TextAlign.center,
+                                        //         ))),
                                         TableCell(
                                             verticalAlignment: TableCellVerticalAlignment.middle,
                                             child: Container(
                                                 alignment: Alignment.center,
                                                 constraints: BoxConstraints(minHeight: 45),
                                                 child: Text(
-                                                  e.jobTitle!,
-                                                  textAlign: TextAlign.center,
-                                                ))),
-                                        TableCell(
-                                            verticalAlignment: TableCellVerticalAlignment.middle,
-                                            child: Container(
-                                                alignment: Alignment.center,
-                                                constraints: BoxConstraints(minHeight: 45),
-                                                child: Text(
-                                                  e.qualifications!,
+                                                  e.jobs
+                                                      .mapIndexed((index, element) => '${index + 1}_${element.title}: ${element.qualifications}')
+                                                      .join('\n'),
                                                   textAlign: TextAlign.center,
                                                 ))),
                                         TableCell(
